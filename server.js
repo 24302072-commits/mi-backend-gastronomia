@@ -1,10 +1,6 @@
-console.log('🔴 INICIANDO SERVIDOR...');
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
-console.log('🔴 MÓDULOS CARGADOS...');
 
 const app = express();
 
@@ -12,29 +8,47 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-console.log('🔴 CONECTANDO A MONGODB...');
-
 // Conexión a MongoDB
-mongoose.connect('mongodb+srv://usuarioproject:Pasword123@mi-proyecto.rwxsbay.mongodb.net/mi-basedatos?appName=mi-proyecto', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://usuarioproject:Pasword123@mi-proyecto.rwxsbay.mongodb.net/mi-basedatos?retryWrites=true&w=majority';
+
+console.log('🔗 Conectando a MongoDB...');
+
+mongoose.connect(MONGODB_URI)
 .then(() => {
-    console.log('✅ Conectado a MongoDB Atlas');
+    console.log('✅ CONECTADO a MongoDB Atlas');
 })
-.catch(err => {
-    console.log('❌ ERROR conectando a MongoDB:', err.message);
-    process.exit(1);
+.catch((error) => {
+    console.log('❌ ERROR MongoDB:', error.message);
 });
 
-// ⚠️ AGREGA ESTE MODELO (FALTABA)
+// Modelo de usuario
 const Usuario = mongoose.model('Usuario', {
     nombre: String,
     email: String,
     fecha: { type: Date, default: Date.now }
 });
 
-// Ruta para registrar usuario (AGREGA ESTA RUTA)
+// RUTA RAÍZ - IMPORTANTE PARA RENDER
+app.get('/', (req, res) => {
+    res.json({ 
+        mensaje: '🚀 Backend funcionando en Render',
+        estado: 'OK',
+        rutas: {
+            health: '/api/health',
+            registro: '/api/registro', 
+            usuarios: '/api/usuarios'
+        }
+    });
+});
+
+app.get('/api/health', (req, res) => {
+    res.json({ 
+        status: '✅ Servidor funcionando',
+        timestamp: new Date().toISOString(),
+        baseDatos: mongoose.connection.readyState === 1 ? 'MongoDB Atlas' : 'Sin conexión'
+    });
+});
+
 app.post('/api/registro', async (req, res) => {
     try {
         const { nombre, email } = req.body;
@@ -47,6 +61,7 @@ app.post('/api/registro', async (req, res) => {
             mensaje: 'Usuario registrado exitosamente',
             usuario: usuario
         });
+
     } catch (error) {
         res.status(500).json({ 
             success: false,
@@ -55,7 +70,6 @@ app.post('/api/registro', async (req, res) => {
     }
 });
 
-// Ruta para obtener todos los usuarios
 app.get('/api/usuarios', async (req, res) => {
     try {
         const usuarios = await Usuario.find();
@@ -65,18 +79,9 @@ app.get('/api/usuarios', async (req, res) => {
     }
 });
 
-// Ruta de salud para verificar que funciona
-app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: '✅ Servidor funcionando', 
-        timestamp: new Date().toISOString(),
-        baseDatos: 'MongoDB Atlas'
-    });
-});
-
-// ⚠️ SOLO UN app.listen() - ELIMINA EL DUPLICADO
+// PUERTO CORREGIDO - ESCUCHAR EN 0.0.0.0
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🎯 Servidor corriendo en http://localhost:${PORT}`);
-    console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🎯 Servidor corriendo en puerto ${PORT}`);
+    console.log(`📊 URL: https://mi-backend-gastronomia.onrender.com`);
 });
