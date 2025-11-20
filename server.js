@@ -4,6 +4,14 @@ const cors = require('cors');
 
 const app = express();
 
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+        'https://tu-frontend.vercel.app'  // ACTUALIZA con tu URL real de Vercel
+    ],
+    credentials: true
+}));
+
 // Middlewares
 app.use(express.json());
 app.use(cors());
