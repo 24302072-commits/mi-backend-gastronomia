@@ -7,7 +7,7 @@ const app = express();
 app.use(cors({
     origin: [
         'http://localhost:5173',
-        'https://tu-frontend.vercel.app'  // ACTUALIZA con tu URL real de Vercel
+        'https://mi-frontend-gastronomia.vercel.app/'  // ACTUALIZA con tu URL real de Vercel
     ],
     credentials: true
 }));
