@@ -5,11 +5,9 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        'https://mi-frontend-gastronomia.vercel.app/'  // ACTUALIZA con tu URL real de Vercel
-    ],
-    credentials: true
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Middlewares
